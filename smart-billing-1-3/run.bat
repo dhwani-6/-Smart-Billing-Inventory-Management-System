@@ -1,0 +1,3 @@
+@echo off
+echo Opening Smart Billing (Phases 1-3) in browser...
+start http://localhost/smart-billing-1-3/
