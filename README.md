@@ -83,3 +83,49 @@ Security features:
 Password hashing
 
 Session protection
+
+🧩 Phase 4 – Inventory Management
+
+Add products with:
+
+Name
+
+Price
+
+Quantity
+
+Inventory features:
+
+Reduce stock on sale
+
+Low-stock alert
+
+Manual stock update
+
+Edit product details
+
+🧩 Phase 5 – Billing System
+
+Customer selection
+
+Product selection
+
+Quantity input
+
+Auto total calculation (JavaScript)
+
+Invoice generation
+
+Unique bill number
+
+Billing data stored in database
+
+🧩 Phase 6 – Reports Module
+
+Daily sales report
+
+Monthly sales report
+
+Product-wise sales report
+
+Print / Export reports (Excel or Print view)
