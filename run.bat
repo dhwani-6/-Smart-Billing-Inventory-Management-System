@@ -1,0 +1,3 @@
+@echo off
+echo Opening project in browser...
+start http://localhost/smart-billing/

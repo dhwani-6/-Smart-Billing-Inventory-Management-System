@@ -28,6 +28,33 @@ if ($prod_result) {
     $product_count = $prod_result->fetch_assoc()['count'];
 }
 
+// --- 2. CHART DATA LOGIC ---
+// Fetch last 6 months sales
+// Format: ['Jan', 'Feb', ...] and [12000, 15000, ...]
+$months = [];
+$totals = [];
+
+// Query for last 6 months
+$chart_sql = "
+    SELECT DATE_FORMAT(sale_date, '%M') as month_name, SUM(total_amount) as total 
+    FROM sales 
+    WHERE sale_date >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+    GROUP BY DATE_FORMAT(sale_date, '%Y-%m') 
+    ORDER BY sale_date ASC
+";
+$chart_result = $conn->query($chart_sql);
+
+if ($chart_result) {
+    while ($row = $chart_result->fetch_assoc()) {
+        $months[] = $row['month_name'];
+        $totals[] = (float) $row['total'];
+    }
+}
+
+// Pass PHP arrays to JS
+$js_months = json_encode($months);
+$js_totals = json_encode($totals);
+
 include '../includes/header.php';
 ?>
 
@@ -82,7 +109,76 @@ include '../includes/header.php';
             </div>
         </div>
 
+        <!-- Sales Chart -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold text-gray-800"><i class="fas fa-chart-area me-2 text-primary"></i>Sales Overview
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="salesChart" height="100"></canvas>
+            </div>
+        </div>
     </div>
 </main>
 
 <?php include '../includes/footer.php'; ?>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('salesChart').getContext('2d');
+
+    // Data from PHP
+    const labels = <?php echo $js_months; ?>;
+    const data = <?php echo $js_totals; ?>;
+
+    // Fallback if no data
+    if (labels.length === 0) {
+        labels.push('No Data');
+        data.push(0);
+    }
+
+    const salesChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Monthly Sales (₹)',
+                data: data,
+                backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                borderColor: 'rgba(78, 115, 223, 1)',
+                borderWidth: 2,
+                pointRadius: 4,
+                pointBackgroundColor: 'rgba(78, 115, 223, 1)',
+                pointBorderColor: '#fff',
+                pointHoverRadius: 6,
+                fill: true,
+                tension: 0.3 // smooth curves
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        borderDash: [2, 2]
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+</script>

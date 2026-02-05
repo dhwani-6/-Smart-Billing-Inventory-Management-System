@@ -57,7 +57,7 @@ function isAdmin()
 function requireLogin()
 {
     if (!isLoggedIn()) {
-        header('Location: /smart-billing-1-6/index.php');
+        header('Location: /smart-billing/index.php');
         exit();
     }
 }
